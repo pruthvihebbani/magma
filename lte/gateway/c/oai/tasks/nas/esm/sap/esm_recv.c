@@ -248,6 +248,8 @@ esm_cause_t esm_recv_pdn_connectivity_request(
     esm_data->pdn_type = ESM_PDN_TYPE_IPV4;
   } else if (msg->pdntype == PDN_TYPE_IPV6) {
     esm_data->pdn_type = ESM_PDN_TYPE_IPV6;
+    OAILOG_ERROR(LOG_NAS_ESM, "ESM-SAP   - Invalid PDN type for (ue_id = %u)\n", ue_id);
+    OAILOG_FUNC_RETURN(LOG_NAS_ESM, ESM_CAUSE_UNKNOWN_PDN_TYPE);
   } else if (msg->pdntype == PDN_TYPE_IPV4V6) {
     esm_data->pdn_type = ESM_PDN_TYPE_IPV4V6;
   } else {
