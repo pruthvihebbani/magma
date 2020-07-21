@@ -640,6 +640,57 @@ class SpgwUtil(object):
         )
         self._stub.CreateBearer(req)
 
+    def create_bearer_ipv6(self, imsi, lbi, qci_val=1):
+        """
+        Sends a CreateBearer Request with ipv6 packet filters to SPGW service
+        """
+        print("Sending CreateBearer request to spgw service")
+        req = CreateBearerRequest(
+            sid=SIDUtils.to_pb(imsi),
+            link_bearer_id=lbi,
+            policy_rules=[
+                PolicyRule(
+                    qos=FlowQos(
+                        qci=qci_val,
+                        gbr_ul=10000000,
+                        gbr_dl=10000000,
+                        max_req_bw_ul=10000000,
+                        max_req_bw_dl=10000000,
+                        arp=QosArp(
+                            priority_level=1, pre_capability=1, pre_vulnerability=0
+                        ),
+                    ),
+                    flow_list=[
+                          FlowDescription(
+                              match=FlowMatch(
+                                  ipv6_dst="5546:222:2259::226",
+                                  ip_proto=FlowMatch.IPPROTO_UDP,
+                                  direction=FlowMatch.UPLINK,
+                              ),
+                              action=FlowDescription.PERMIT,
+                          ),
+                        FlowDescription(
+                            match=FlowMatch(
+                                ip_proto=FlowMatch.IPPROTO_UDP,
+                                direction=FlowMatch.UPLINK,
+                            ),
+                            action=FlowDescription.PERMIT,
+                        ),
+                        FlowDescription(
+                            match=FlowMatch(
+                                ipv6_dst="5546:222:2259::226",
+                                ip_proto=FlowMatch.IPPROTO_UDP,
+                                direction=FlowMatch.DOWNLINK,
+                            ),
+                            action=FlowDescription.PERMIT,
+                        ),
+                   ],
+                )
+            ],
+        )
+        self._stub.CreateBearer(req)
+
+
     def delete_bearer(self, imsi, lbi, ebi):
         """
         Sends a DeleteBearer Request to SPGW service
