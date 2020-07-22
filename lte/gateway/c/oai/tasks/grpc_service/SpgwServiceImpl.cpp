@@ -323,9 +323,7 @@ bool SpgwServiceImpl::fillIpv4(
 }
 
 bool SpgwServiceImpl::fillIpv6(
-  packet_filter_contents_t* pf_content,
-  const std::string ipv6addr)
-{
+    packet_filter_contents_t* pf_content, const std::string ipv6addr) {
   struct in6_addr in6addr;
   if (inet_pton(AF_INET6, ipv6addr.c_str(), &in6addr) != 1) {
     OAILOG_ERROR(LOG_UTIL, "Invalid address string %s \n", ipv6addr.c_str());
@@ -336,24 +334,16 @@ bool SpgwServiceImpl::fillIpv6(
   }
 
   OAILOG_ERROR(
-    LOG_UTIL,
-    "Network Address: %x:%x:%x:%x:%x:%x:%x:%x:%x:%x:%x:%x:%x:%x:%x:%x\n",
-    pf_content->ipv6remoteaddr[0].addr,
-    pf_content->ipv6remoteaddr[1].addr,
-    pf_content->ipv6remoteaddr[2].addr,
-    pf_content->ipv6remoteaddr[3].addr,
-    pf_content->ipv6remoteaddr[4].addr,
-    pf_content->ipv6remoteaddr[5].addr,
-    pf_content->ipv6remoteaddr[6].addr,
-    pf_content->ipv6remoteaddr[7].addr,
-    pf_content->ipv6remoteaddr[8].addr,
-    pf_content->ipv6remoteaddr[9].addr,
-    pf_content->ipv6remoteaddr[10].addr,
-    pf_content->ipv6remoteaddr[11].addr,
-    pf_content->ipv6remoteaddr[12].addr,
-    pf_content->ipv6remoteaddr[13].addr,
-    pf_content->ipv6remoteaddr[14].addr,
-    pf_content->ipv6remoteaddr[15].addr);
+      LOG_UTIL,
+      "Network Address: %x:%x:%x:%x:%x:%x:%x:%x:%x:%x:%x:%x:%x:%x:%x:%x\n",
+      pf_content->ipv6remoteaddr[0].addr, pf_content->ipv6remoteaddr[1].addr,
+      pf_content->ipv6remoteaddr[2].addr, pf_content->ipv6remoteaddr[3].addr,
+      pf_content->ipv6remoteaddr[4].addr, pf_content->ipv6remoteaddr[5].addr,
+      pf_content->ipv6remoteaddr[6].addr, pf_content->ipv6remoteaddr[7].addr,
+      pf_content->ipv6remoteaddr[8].addr, pf_content->ipv6remoteaddr[9].addr,
+      pf_content->ipv6remoteaddr[10].addr, pf_content->ipv6remoteaddr[11].addr,
+      pf_content->ipv6remoteaddr[12].addr, pf_content->ipv6remoteaddr[13].addr,
+      pf_content->ipv6remoteaddr[14].addr, pf_content->ipv6remoteaddr[15].addr);
   return true;
 }
 

@@ -657,18 +657,20 @@ class SpgwUtil(object):
                         max_req_bw_ul=10000000,
                         max_req_bw_dl=10000000,
                         arp=QosArp(
-                            priority_level=1, pre_capability=1, pre_vulnerability=0
+                            priority_level=1,
+                            pre_capability=1,
+                            pre_vulnerability=0,
                         ),
                     ),
                     flow_list=[
-                          FlowDescription(
-                              match=FlowMatch(
-                                  ipv6_dst="5546:222:2259::226",
-                                  ip_proto=FlowMatch.IPPROTO_UDP,
-                                  direction=FlowMatch.UPLINK,
-                              ),
-                              action=FlowDescription.PERMIT,
-                          ),
+                        FlowDescription(
+                            match=FlowMatch(
+                                ipv6_dst="5546:222:2259::226",
+                                ip_proto=FlowMatch.IPPROTO_UDP,
+                                direction=FlowMatch.UPLINK,
+                            ),
+                            action=FlowDescription.PERMIT,
+                        ),
                         FlowDescription(
                             match=FlowMatch(
                                 ip_proto=FlowMatch.IPPROTO_UDP,
@@ -684,12 +686,11 @@ class SpgwUtil(object):
                             ),
                             action=FlowDescription.PERMIT,
                         ),
-                   ],
+                    ],
                 )
             ],
         )
         self._stub.CreateBearer(req)
-
 
     def delete_bearer(self, imsi, lbi, ebi):
         """

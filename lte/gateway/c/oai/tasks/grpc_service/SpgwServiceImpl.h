@@ -107,14 +107,13 @@ class SpgwServiceImpl final : public SpgwService::Service {
     const std::string ipv4addr);
 
   /*
-    * Fill up the ipv6 remote address field in packet filter
-    * @param pf_content: packet filter object to be filled
-    * @param ipv6addr: IPv6 address in string form (e.g, "x:x:x:x::x")
-    * @return bool: Return true if successful, false if not
-    */
+   * Fill up the ipv6 remote address field in packet filter
+   * @param pf_content: packet filter object to be filled
+   * @param ipv6addr: IPv6 address in string form (e.g, "x:x:x:x::x")
+   * @return bool: Return true if successful, false if not
+   */
   bool fillIpv6(
-    packet_filter_contents_t* pf_content,
-    const std::string ipv6addr);
+      packet_filter_contents_t* pf_content, const std::string ipv6addr);
 };
 
 } // namespace magma
