@@ -682,6 +682,48 @@ void mme_ue_context_update_coll_keys(
   ue_context_p->mme_teid_s11 = mme_teid_s11;
 
   if (guti_p) {
+    if (!(ue_context_p->emm_context.member_present_mask & EMM_CTXT_MEMBER_GUTI)) {
+    if (
+      (guti_p->gummei.mme_code != 0) ||
+      (guti_p->gummei.mme_gid != 0) ||
+      (guti_p->m_tmsi != INVALID_M_TMSI) ||
+      (guti_p->gummei.plmn.mcc_digit1 != 0) ||
+      (guti_p->gummei.plmn.mcc_digit2 != 0) ||
+      (guti_p->gummei.plmn.mcc_digit3 != 0)) {
+      h_rc = obj_hashtable_uint64_ts_remove(
+        mme_ue_context_p->guti_ue_context_htbl,
+        &ue_context_p->emm_context._guti,
+        sizeof(*guti_p));
+    OAILOG_ERROR(
+      LOG_MME_APP,
+      "Pruthvi guti size %lu, emm cntxt guti size %lu\n",sizeof(*guti_p), sizeof(ue_context_p->emm_context._guti));
+ 
+      if (INVALID_MME_UE_S1AP_ID != mme_ue_s1ap_id) {
+        h_rc = obj_hashtable_uint64_ts_insert(
+          mme_ue_context_p->guti_ue_context_htbl,
+          (const void *const) guti_p,
+          sizeof(*guti_p),
+          (uint64_t) mme_ue_s1ap_id);
+      } else {
+        h_rc = HASH_TABLE_KEY_NOT_EXISTS;
+      }
+
+      if (HASH_TABLE_OK != h_rc) {
+        OAILOG_ERROR_UE(
+          LOG_MME_APP,
+          imsi,
+          "Error could not update this ue context %p "
+          "enb_ue_s1ap_ue_id " ENB_UE_S1AP_ID_FMT
+          " mme_ue_s1ap_id " MME_UE_S1AP_ID_FMT " guti " GUTI_FMT " %s\n",
+          ue_context_p,
+          ue_context_p->enb_ue_s1ap_id,
+          ue_context_p->mme_ue_s1ap_id,
+          GUTI_ARG(guti_p),
+          hashtable_rc_code2string(h_rc));
+      }
+     }
+    }
+#if 0
     if (
       (guti_p->gummei.mme_code !=
        ue_context_p->emm_context._guti.gummei.mme_code) ||
@@ -725,6 +767,7 @@ void mme_ue_context_update_coll_keys(
       }
       ue_context_p->emm_context._guti = *guti_p;
     }
+#endif
   }
   OAILOG_FUNC_OUT(LOG_MME_APP);
 }
@@ -886,7 +929,7 @@ int mme_insert_ue_context(
     if (
       (0 != ue_context_p->emm_context._guti.gummei.mme_code) ||
       (0 != ue_context_p->emm_context._guti.gummei.mme_gid) ||
-      (0 != ue_context_p->emm_context._guti.m_tmsi) ||
+      (INVALID_M_TMSI != ue_context_p->emm_context._guti.m_tmsi) ||
       (0 != ue_context_p->emm_context._guti.gummei.plmn
               .mcc_digit1) || // MCC 000 does not exist in ITU table
       (0 != ue_context_p->emm_context._guti.gummei.plmn.mcc_digit2) ||
@@ -947,12 +990,13 @@ void mme_remove_ue_context(
     OAILOG_ERROR(LOG_MME_APP, "Invalid UE context received\n");
     OAILOG_FUNC_OUT(LOG_MME_APP);
   }
+      OAILOG_ERROR(
+        LOG_MME_APP,
+        "Pruthvi mme_remove_ue_context before remove\n");
 
-  // Release emm and esm context
-  delete_mme_ue_state(ue_context_p->emm_context._imsi64);
-  _clear_emm_ctxt(&ue_context_p->emm_context);
-  mme_app_ue_context_free_content(ue_context_p);
-  // IMSI
+mme_ue_context_dump_coll_keys(mme_ue_context_p);
+
+ // IMSI
   if (ue_context_p->emm_context._imsi64) {
     hash_rc = hashtable_uint64_ts_remove(
       mme_ue_context_p->imsi_mme_ue_id_htbl,
@@ -1000,6 +1044,7 @@ void mme_remove_ue_context(
         ue_context_p->mme_ue_s1ap_id,
         ue_context_p->mme_teid_s11);
   }
+
   // filled guti
   if (
     (ue_context_p->emm_context._guti.gummei.mme_code) ||
@@ -1023,7 +1068,6 @@ void mme_remove_ue_context(
         ue_context_p->enb_ue_s1ap_id,
         ue_context_p->mme_ue_s1ap_id);
   }
-
   // filled NAS UE ID/ MME UE S1AP ID
   if (INVALID_MME_UE_S1AP_ID != ue_context_p->mme_ue_s1ap_id) {
     hash_rc = hashtable_ts_remove(
@@ -1040,7 +1084,15 @@ void mme_remove_ue_context(
         ue_context_p->enb_ue_s1ap_id,
         ue_context_p->mme_ue_s1ap_id);
   }
+      OAILOG_ERROR(
+        LOG_MME_APP,
+        "Pruthvi after mme_remove_ue_context \n");
 
+  mme_ue_context_dump_coll_keys(mme_ue_context_p);
+  // Release emm and esm context
+  delete_mme_ue_state(ue_context_p->emm_context._imsi64);
+  _clear_emm_ctxt(&ue_context_p->emm_context);
+  mme_app_ue_context_free_content(ue_context_p);
   _directoryd_remove_location(
     ue_context_p->emm_context._imsi64,
     ue_context_p->emm_context._imsi.length);

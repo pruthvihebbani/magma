@@ -919,6 +919,11 @@ void mme_app_handle_delete_session_rsp(
     delete_sess_resp_pP->teid);
   ue_context_p = mme_ue_context_exists_s11_teid(
     &mme_app_desc_p->mme_ue_contexts, delete_sess_resp_pP->teid);
+  OAILOG_ERROR(
+    LOG_MME_APP,
+    "Pruthvi in mme_app_handle_delete_session_rsp before remove"
+    "\n ");
+  mme_ue_context_dump_coll_keys(&mme_app_desc_p->mme_ue_contexts);
 
   if (!ue_context_p) {
     OAILOG_WARNING(
@@ -991,6 +996,13 @@ void mme_app_handle_delete_session_rsp(
       "mme_ue_s1ap_id " MME_UE_S1AP_ID_FMT "\n ",
       ue_context_p->mme_ue_s1ap_id);
     mme_remove_ue_context(&mme_app_desc_p->mme_ue_contexts, ue_context_p);
+  OAILOG_ERROR(
+    LOG_MME_APP,
+    "Pruthvi in mme_app_handle_delete_session_rsp after remove"
+    "\n ");
+  mme_ue_context_dump_coll_keys(&mme_app_desc_p->mme_ue_contexts);
+
+
     OAILOG_FUNC_OUT(LOG_MME_APP);
   } else {
     if (ue_context_p->ue_context_rel_cause == S1AP_INVALID_CAUSE) {

@@ -473,7 +473,8 @@ int mme_api_new_guti(
     if (guti->m_tmsi == INVALID_M_TMSI) {
       OAILOG_FUNC_RETURN(LOG_NAS, RETURNerror);
     }
-    mme_api_notify_new_guti(ue_context->mme_ue_s1ap_id, guti);
+    emm_ctx_set_guti(&ue_context->emm_context, guti);
+    mme_api_notify_new_guti(ue_context->mme_ue_s1ap_id, &ue_context->emm_context._guti);
   } else {
     OAILOG_FUNC_RETURN(LOG_NAS, RETURNerror);
   }

@@ -1736,7 +1736,8 @@ static int _emm_send_attach_accept(emm_context_t *emm_context)
           &emm_context->originating_tai,
           &emm_context->_tai_list);
         if (RETURNok == rc) {
-          emm_ctx_set_guti(emm_context, &guti);
+          //emm_ctx_set_guti(emm_context, &guti);
+          emm_ctx_set_attribute_present(emm_context, EMM_CTXT_MEMBER_GUTI);
           emm_ctx_set_attribute_valid(emm_context, EMM_CTXT_MEMBER_TAI_LIST);
           //----------------------------------------
           REQUIREMENT_3GPP_24_301(R10_5_5_1_2_4__6);

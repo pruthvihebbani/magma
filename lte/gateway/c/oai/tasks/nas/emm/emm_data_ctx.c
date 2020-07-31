@@ -108,7 +108,7 @@ inline void emm_ctx_clear_guti(emm_context_t *const ctxt)
 inline void emm_ctx_set_guti(emm_context_t *const ctxt, guti_t *guti)
 {
   ctxt->_guti = *guti;
-  emm_ctx_set_attribute_present(ctxt, EMM_CTXT_MEMBER_GUTI);
+  //emm_ctx_set_attribute_present(ctxt, EMM_CTXT_MEMBER_GUTI);
   OAILOG_DEBUG(
     LOG_NAS_EMM,
     "ue_id=" MME_UE_S1AP_ID_FMT " set GUTI " GUTI_FMT " (present)\n",
