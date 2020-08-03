@@ -220,6 +220,7 @@ int emm_proc_attach_request(
   emm_context_t *new_emm_ctx = NULL;
   imsi64_t imsi64 = INVALID_IMSI64;
   mme_ue_s1ap_id_t old_ue_id = INVALID_MME_UE_S1AP_ID;
+  bool wait_for_implicit_detach = false;
 
   if (ies->imsi) {
     imsi64 = imsi_to_imsi64(ies->imsi);
@@ -390,6 +391,7 @@ int emm_proc_attach_request(
           rc = emm_sap_send(&emm_sap);
           // Allocate new context and process the new request as fresh attach request
           clear_emm_ctxt = true;
+          imsi_ue_mm_ctx->emm_context.wait_for_implicit_detach = true;
           increment_counter(
             "duplicate_attach_request",
             1,
@@ -428,6 +430,7 @@ int emm_proc_attach_request(
           rc = emm_sap_send(&emm_sap);
           // Allocate new context and process the new request as fresh attach request
           clear_emm_ctxt = true;
+          imsi_ue_mm_ctx->emm_context.wait_for_implicit_detach = true;
         } else {
           imsi_ue_mm_ctx->emm_context.num_attach_request++;
           REQUIREMENT_3GPP_24_301(R10_5_5_1_2_7_d__2);
@@ -486,6 +489,7 @@ int emm_proc_attach_request(
             "action",
             "processed_old_ctxt_cleanup");
           clear_emm_ctxt = true;
+          imsi_ue_mm_ctx->emm_context.wait_for_implicit_detach = true;
         } else {
           REQUIREMENT_3GPP_24_301(R10_5_5_1_2_7_e__2);
           /*
@@ -564,7 +568,6 @@ int emm_proc_attach_request(
 
     bdestroy(new_emm_ctx->esm_msg);
     emm_init_context(new_emm_ctx, true);
-
     new_emm_ctx->num_attach_request++;
     new_emm_ctx->attach_type = ies->type;
     new_emm_ctx->additional_update_type = ies->additional_update_type;
@@ -574,6 +577,10 @@ int emm_proc_attach_request(
       ue_id);
     new_emm_ctx->is_dynamic = true;
     new_emm_ctx->emm_cause = EMM_CAUSE_SUCCESS;
+    //new_emm_ctx->wait_for_implicit_detach = wait_for_implicit_detach;
+  OAILOG_ERROR(
+    LOG_NAS_EMM,
+    "Pruthvi in proc_attach_req %d\n",new_emm_ctx->wait_for_implicit_detach);
     // Store Voice Domain pref IE to be sent to MME APP
     if (ies->voicedomainpreferenceandueusagesetting) {
       memcpy(
@@ -586,7 +593,9 @@ int emm_proc_attach_request(
   if (!is_nas_specific_procedure_attach_running(&ue_mm_context->emm_context)) {
     _emm_proc_create_procedure_attach_request(ue_mm_context, ies);
   }
-  rc = _emm_attach_run_procedure(&ue_mm_context->emm_context);
+  if (!wait_for_implicit_detach) {
+    rc = _emm_attach_run_procedure(&ue_mm_context->emm_context);
+  }
   OAILOG_FUNC_RETURN(LOG_NAS_EMM, rc);
 }
 /*
@@ -2505,5 +2514,48 @@ static int _emm_attach_update(
     emm_ctx_set_valid_imei(emm_context, ies->imei);
   }
 
+  OAILOG_FUNC_RETURN(LOG_NAS_EMM, RETURNok);
+}
+
+int nas_proceed_with_new_attach(
+  ue_mm_context_t* ue_context_p)
+{
+  OAILOG_FUNC_IN(LOG_NAS_EMM);
+  emm_context_t *new_emm_ctx = NULL;
+  new_emm_ctx = &ue_context_p->emm_context;
+
+  bdestroy(new_emm_ctx->esm_msg);
+  emm_init_context(new_emm_ctx, true);
+  new_emm_ctx->num_attach_request++;
+  new_emm_ctx->attach_type = ies->type;
+  new_emm_ctx->additional_update_type = ies->additional_update_type;
+  OAILOG_NOTICE(
+    LOG_NAS_EMM,
+    "EMM-PROC  - Create EMM context ue_id = " MME_UE_S1AP_ID_FMT "\n",
+    ue_id);
+  new_emm_ctx->is_dynamic = true;
+  new_emm_ctx->emm_cause = EMM_CAUSE_SUCCESS;
+  //new_emm_ctx->wait_for_implicit_detach = wait_for_implicit_detach;
+  OAILOG_ERROR(
+    LOG_NAS_EMM,
+    "Pruthvi in proc_attach_req %d\n",new_emm_ctx->wait_for_implicit_detach);
+    // Store Voice Domain pref IE to be sent to MME APP
+  if (ies->voicedomainpreferenceandueusagesetting) {
+    memcpy(
+      &new_emm_ctx->volte_params.voice_domain_preference_and_ue_usage_setting,
+      ies->voicedomainpreferenceandueusagesetting,
+      sizeof(voice_domain_preference_and_ue_usage_setting_t));
+    new_emm_ctx->volte_params.presencemask  |= VOICE_DOMAIN_PREF_UE_USAGE_SETTING;
+  
+  }
+  if (!is_nas_specific_procedure_attach_running(&ue_mm_context->emm_context)) {
+    _emm_proc_create_procedure_attach_request(ue_mm_context, ies);
+  }
+  if (!wait_for_implicit_detach) {
+    rc = _emm_attach_run_procedure(&ue_mm_context->emm_context);
+  }
+ 
+  //emm_context->wait_for_implicit_detach = false;
+  _emm_attach_run_procedure(emm_context);
   OAILOG_FUNC_RETURN(LOG_NAS_EMM, RETURNok);
 }

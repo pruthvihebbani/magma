@@ -690,14 +690,20 @@ void mme_ue_context_update_coll_keys(
       (guti_p->gummei.plmn.mcc_digit1 != 0) ||
       (guti_p->gummei.plmn.mcc_digit2 != 0) ||
       (guti_p->gummei.plmn.mcc_digit3 != 0)) {
+    OAILOG_ERROR(
+      LOG_MME_APP,
+      "Pruthvi in mme_ue_context_update_coll_keys before guti remove\n");
+     mme_ue_context_dump_coll_keys(mme_ue_context_p);
+
       h_rc = obj_hashtable_uint64_ts_remove(
         mme_ue_context_p->guti_ue_context_htbl,
         &ue_context_p->emm_context._guti,
         sizeof(*guti_p));
     OAILOG_ERROR(
       LOG_MME_APP,
-      "Pruthvi guti size %lu, emm cntxt guti size %lu\n",sizeof(*guti_p), sizeof(ue_context_p->emm_context._guti));
- 
+      "Pruthvi in mme_ue_context_update_coll_keys after guti remove\n");
+     mme_ue_context_dump_coll_keys(mme_ue_context_p);
+
       if (INVALID_MME_UE_S1AP_ID != mme_ue_s1ap_id) {
         h_rc = obj_hashtable_uint64_ts_insert(
           mme_ue_context_p->guti_ue_context_htbl,
@@ -707,6 +713,11 @@ void mme_ue_context_update_coll_keys(
       } else {
         h_rc = HASH_TABLE_KEY_NOT_EXISTS;
       }
+    OAILOG_ERROR(
+      LOG_MME_APP,
+      "Pruthvi in mme_ue_context_update_coll_keys after guti insert\n");
+     mme_ue_context_dump_coll_keys(mme_ue_context_p);
+
 
       if (HASH_TABLE_OK != h_rc) {
         OAILOG_ERROR_UE(
@@ -995,7 +1006,11 @@ void mme_remove_ue_context(
         "Pruthvi mme_remove_ue_context before remove\n");
 
 mme_ue_context_dump_coll_keys(mme_ue_context_p);
-
+  // Release emm and esm context
+  delete_mme_ue_state(ue_context_p->emm_context._imsi64);
+ // _clear_emm_ctxt(&ue_context_p->emm_context);
+  //mme_app_ue_context_free_content(ue_context_p);
+ 
  // IMSI
   if (ue_context_p->emm_context._imsi64) {
     hash_rc = hashtable_uint64_ts_remove(
@@ -1089,11 +1104,10 @@ mme_ue_context_dump_coll_keys(mme_ue_context_p);
         "Pruthvi after mme_remove_ue_context \n");
 
   mme_ue_context_dump_coll_keys(mme_ue_context_p);
-  // Release emm and esm context
-  delete_mme_ue_state(ue_context_p->emm_context._imsi64);
+
   _clear_emm_ctxt(&ue_context_p->emm_context);
   mme_app_ue_context_free_content(ue_context_p);
-  _directoryd_remove_location(
+ _directoryd_remove_location(
     ue_context_p->emm_context._imsi64,
     ue_context_p->emm_context._imsi.length);
   free_wrapper((void **) &ue_context_p);

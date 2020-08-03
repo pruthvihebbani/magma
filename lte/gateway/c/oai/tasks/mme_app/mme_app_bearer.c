@@ -84,6 +84,7 @@
 #endif
 
 extern task_zmq_ctx_t mme_app_task_zmq_ctx;
+extern int nas_proceed_with_new_attach(ue_mm_context_t* ue_context_p);
 
 int send_modify_bearer_req(mme_ue_s1ap_id_t ue_id, ebi_t ebi)
 {
@@ -995,7 +996,14 @@ void mme_app_handle_delete_session_rsp(
       "Deleting UE context associated in MME for "
       "mme_ue_s1ap_id " MME_UE_S1AP_ID_FMT "\n ",
       ue_context_p->mme_ue_s1ap_id);
+    bool wait_for_implicit_detach = ue_context_p->emm_context.wait_for_implicit_detach;
+  OAILOG_ERROR(
+    LOG_MME_APP,
+    "Pruthvi in mme_app_handle_delete_session_rsp wait_for_implicit_detach %d\n",wait_for_implicit_detach);
     mme_remove_ue_context(&mme_app_desc_p->mme_ue_contexts, ue_context_p);
+    if (wait_for_implicit_detach) {
+      nas_proceed_with_new_attach(ue_context_p);
+    }
   OAILOG_ERROR(
     LOG_MME_APP,
     "Pruthvi in mme_app_handle_delete_session_rsp after remove"

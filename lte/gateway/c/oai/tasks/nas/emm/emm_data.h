@@ -349,6 +349,7 @@ typedef struct emm_context_s {
    *if this flag is set after receving service req, send detach
    */
   bool nw_init_bearer_deactv;
+  bool wait_for_implicit_detach;
 } emm_context_t;
 
 /*
