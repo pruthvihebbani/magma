@@ -67,6 +67,7 @@ bool mme_sctp_bounded   = false;
 task_zmq_ctx_t mme_app_task_zmq_ctx;
 
 static int handle_message(zloop_t* loop, zsock_t* reader, void* arg) {
+  OAI_FPRINTF_INFO("test_branch_b\n");
   zframe_t* msg_frame = zframe_recv(reader);
   assert(msg_frame);
   MessageDef* received_message_p = (MessageDef*) zframe_data(msg_frame);
