@@ -74,6 +74,7 @@ static int handle_message(zloop_t* loop, zsock_t* reader, void* arg) {
   imsi64_t imsi64                = itti_get_associated_imsi(received_message_p);
   mme_app_desc_t* mme_app_desc_p = get_mme_nas_state(false);
 
+  OAI_FPRINTF_INFO("test branch_a\n");
   switch (ITTI_MSG_ID(received_message_p)) {
     case MESSAGE_TEST: {
       OAI_FPRINTF_INFO("TASK_MME_APP received MESSAGE_TEST\n");
