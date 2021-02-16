@@ -132,6 +132,7 @@ int main(int argc, char* argv[]) {
 #endif
   CHECK_INIT_RETURN(s1ap_mme_init(&mme_config));
   CHECK_INIT_RETURN(s6a_init(&mme_config));
+  CHECK_INIT_RETURN(s13_init(&mme_config));
 
   // Create SGS Task only if non_eps_service_control is not set to OFF
   char* non_eps_service_control = bdata(mme_config.non_eps_service_control);

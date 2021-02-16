@@ -362,25 +362,25 @@ typedef enum {
   DIAMETER_ERROR_RAT_NOT_ALLOWED           = 5421,
   DIAMETER_ERROR_EQUIPMENT_UNKNOWN         = 5422,
   DIAMETER_ERROR_UNKOWN_SERVING_NODE       = 5423,
-} s6a_experimental_result_t;
+} experimental_result_t;
 
 typedef enum {
   DIAMETER_SUCCESS          = 2001,
   DIAMETER_UNABLE_TO_COMPLY = 5012,
-} s6a_base_result_t;
+} base_result_t;
 
 typedef struct {
-#define S6A_RESULT_BASE 0x0
-#define S6A_RESULT_EXPERIMENTAL 0x1
+#define RESULT_BASE 0x0
+#define RESULT_EXPERIMENTAL 0x1
   unsigned present : 1;
 
   union {
     /* Experimental result as defined in 3GPP TS 29.272 */
-    s6a_experimental_result_t experimental;
+    experimental_result_t experimental;
     /* Diameter basics results as defined in RFC 3588 */
-    s6a_base_result_t base;
+    base_result_t base;
   } choice;
-} s6a_result_t;
+} diameter_result_t;
 
 typedef enum {
   MME_UPDATE_PROCEDURE = 0,

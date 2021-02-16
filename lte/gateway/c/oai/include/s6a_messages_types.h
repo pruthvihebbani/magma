@@ -83,7 +83,7 @@ typedef struct s6a_update_location_req_s {
 } s6a_update_location_req_t;
 
 typedef struct s6a_update_location_ans_s {
-  s6a_result_t result;  // Result of the update location request procedure
+  diameter_result_t result;  // Result of the update location request procedure
   subscription_data_t subscription_data;  // subscriber status,
   // Maximum Requested Bandwidth Uplink, downlink
   // access restriction data
@@ -117,7 +117,7 @@ typedef struct s6a_auth_info_ans_s {
   uint8_t imsi_length;
 
   /* Result of the authentication information procedure */
-  s6a_result_t result;
+  diameter_result_t result;
   /* Authentication info containing the vector(s) */
   authentication_info_t auth_info;
 } s6a_auth_info_ans_t;
@@ -147,7 +147,7 @@ typedef struct s6a_purge_ue_ans_s {
   char imsi[IMSI_BCD_DIGITS_MAX + 1];
   uint8_t imsi_length;
   /* Result of the purge ue procedure */
-  s6a_result_t result;
+  diameter_result_t result;
   unsigned freeze_m_tmsi : 1;
   unsigned freeze_p_tmsi : 1;
 } s6a_purge_ue_ans_t;
